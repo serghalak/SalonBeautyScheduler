@@ -15,7 +15,7 @@ public abstract class Person {
     @Column(name="LAST_NAME")
     private String lastName;
 
-    @NotBlank(message="Phone number cannot be empty")
+    //@NotBlank(message="Phone number cannot be empty")
     @Column(name="PHONE_NUMBER")
     private String phoneNumber;
 

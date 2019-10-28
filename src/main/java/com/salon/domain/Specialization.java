@@ -22,8 +22,8 @@ public class Specialization implements Serializable {
 
     @ManyToMany
     @JoinTable(name="master_specialization"
-            ,joinColumns = @JoinColumn(name = "specialization_id")
-            ,inverseJoinColumns = @JoinColumn(name="master_id"/*,referencedColumnName = "masterId"*/))
+            ,joinColumns = @JoinColumn(name = "specialization_id"/*,referencedColumnName = "id"*/)
+            ,inverseJoinColumns = @JoinColumn(name="master_id"/*,referencedColumnName = "id"*/))
     private Set<Master> masters=new HashSet<>();
 
     public Long getId() {

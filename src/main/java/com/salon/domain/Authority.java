@@ -3,13 +3,15 @@ package com.salon.domain;
 
 //import org.springframework.data.annotation.Id;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 //@Table
-public class Authority  /*implements GrantedAuthority*/{
+public class Authority  implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -44,5 +46,10 @@ public class Authority  /*implements GrantedAuthority*/{
 
     public void setUsers(Set<User> users) {
         this.users = users;
+    }
+
+    @Override
+    public String getAuthority() {
+        return roleName;
     }
 }
