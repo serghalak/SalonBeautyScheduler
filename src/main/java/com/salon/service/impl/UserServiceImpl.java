@@ -13,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
@@ -59,7 +61,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return userRepo.findUserByEmail(s);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        User userByEmail = userRepo.findUserByEmail(email);
+        if(userByEmail==null){
+            throw new UsernameNotFoundException("User with email: "+email+" not found");
+        }
+        //return new org.springframework.security.core.userdetails.User(
+        // userByEmail.getEmail(),userByEmail.getPassword(),new ArrayList<>());
+        return userByEmail;
     }
 }
