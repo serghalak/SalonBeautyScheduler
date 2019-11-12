@@ -1,13 +1,11 @@
-package com.salon.config;
+package com.salon.security;
 
-import com.salon.common.SecurityConstants;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.salon.security.SecurityConstants;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -32,7 +30,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 /*.cors().and()*/
                 .csrf().disable()
                     .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+                    //.antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+                    .antMatchers("/**").permitAll()
+                    //.antMatchers(HttpMethod.GET,SecurityConstants.SIGN_UP_URL).permitAll()
                 /*.antMatchers(HttpMethod.GET, SecurityConstants.VERIFICATION_EMAIL_URL)
                 .permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.PASSWORD_RESET_REQUEST_URL)
@@ -44,7 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*//**", "/webjars/**")
                 .permitAll()*/
                 .anyRequest().authenticated()
-                .and().formLogin();
+                //.and().addFilter(new AuthenticationFilter(authenticationManager()));
+                .and().addFilter(getAuthenticationFilter())
+                    .addFilter(new AuthorizationFilter(authenticationManager()));
                 /*.and()
                 .addFilter(getAuthenticationFilter())
                 .addFilter(new AuthorizationFilter(authenticationManager()))
@@ -60,6 +62,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    public AuthenticationFilter getAuthenticationFilter()throws Exception{
+        final AuthenticationFilter filter=new AuthenticationFilter(authenticationManager());
+        filter.setFilterProcessesUrl("/api/users/login");
+        return filter;
+    }
 
 
 

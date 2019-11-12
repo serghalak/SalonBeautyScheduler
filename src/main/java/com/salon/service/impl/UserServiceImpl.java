@@ -12,8 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -61,14 +63,98 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getUser(String email) {
+        User userByEmail = userRepo.findUserByEmail(email);
+        if(userByEmail==null){
+            throw new UsernameNotFoundException("User with email: "+email+" not found");
+        }
+
+        //UserDetails userDetails = loadUserByUsername(email);
+        UserDto userDto=new UserDto();
+        BeanUtils.copyProperties(userByEmail,userDto);
+        return userDto;
+    }
+
+    @Override
+    public List<UserDto> getListUsers() {
+        Iterable<User> users = userRepo.findAll();
+//        //System.out.println(new ArrayList<User>());
+        List<UserDto>returnListUsers=new ArrayList<>();
+//
+        for (User user:users){
+            UserDto userDto=new UserDto();
+            //System.out.println(user);
+            BeanUtils.copyProperties(user,userDto);
+            returnListUsers.add(userDto);
+        }
+        return returnListUsers;
+  //      return null;
+    }
+
+    @Override
+    public UserDto updateUser(UserDto user) {
+        if(user == null){
+            throw new RuntimeException("user is null");
+        }
+
+
+        User userDb =userRepo.findUserByUserId(user.getUserId());
+        if(userDb == null){
+            throw new RuntimeException("User "+user.getUserName()+" not found in db");
+        }
+
+
+        userDb.setFirstName(user.getFirstName());
+        userDb.setLastName(user.getLastName());
+        userDb.setEmail(user.getEmail());
+        if(user.getPassword()==null
+                || user.getPassword().isEmpty()
+                || user.getPassword()==""
+                || user.getPassword().equals("")){
+
+        }else{
+            userDb.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
+        //BeanUtils.copyProperties(user,userDb);
+
+        User updatedUser = userRepo.save(userDb);
+        if(updatedUser==null){
+            throw new RuntimeException("User: " + user.getUserName()+" did not updated");
+        }
+        UserDto returnUserDto=new UserDto();
+        BeanUtils.copyProperties(updatedUser,returnUserDto);
+        return returnUserDto;
+
+        //return null;
+    }
+
+    @Override
+    public void deleteUser( UserDto user) {
+        if(user==null){
+            throw new RuntimeException("user is empty");
+        }
+        User userDb=userRepo.findUserByUserId(user.getUserId());
+        if(userDb==null){
+            throw new RuntimeException("User: " + user.getUserName()+"is not exists");
+        }
+
+        //User userDb=new User();
+        //BeanUtils.copyProperties(user,userDb);
+
+        userRepo.delete(userDb);
+
+        //return null;
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         User userByEmail = userRepo.findUserByEmail(email);
         if(userByEmail==null){
             throw new UsernameNotFoundException("User with email: "+email+" not found");
         }
-        //return new org.springframework.security.core.userdetails.User(
-        // userByEmail.getEmail(),userByEmail.getPassword(),new ArrayList<>());
-        return userByEmail;
+        return new org.springframework.security.core.userdetails.User(
+         userByEmail.getEmail(),userByEmail.getPassword(),new ArrayList<>());
+        //return userByEmail;
     }
 }

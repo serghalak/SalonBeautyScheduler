@@ -16,6 +16,12 @@ public class UserDto implements Serializable {
     //private String emailStatus;
     private Boolean active=false;
 
+//    private String password;//plain text
+//    private String encryptedPassword;
+//    private String emailVerificationToken;
+//    private String getEmailVerificationStatus;
+
+
     private String phoneNumber;
 
     public String getPhoneNumber() {
